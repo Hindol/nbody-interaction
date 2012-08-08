@@ -11,7 +11,6 @@
 #define GFORCE 4.
 #define TIMESTEP 0.01
 #define MINDIST (0.00001)
-//#define STEPLIMIT (1000.*TIMESTEP)
 #define STEPLIMIT (1000.*TIMESTEP)
 
 using namespace std;
@@ -61,6 +60,10 @@ void startBodies(int n)
     }
 }
 
+/**
+ * Note: This function writes to body acceleration values but never uses values from it
+ *  except for body mass which is a constant. So this function should be parallelizable.
+ */
 void addAcc(int i, int j) {
 
     // Compute the force between bodies and apply to each as an acceleration
@@ -105,6 +108,7 @@ void runSerialBodies(int n)
                 addAcc(i, j);
 
         // apply accelerations and advance the bodies
+        // body[i] is accessed only in the i'th loop, so this can be parallelized
         #pragma omp parallel for
         for (i = 0; i < n; ++i)
         {
