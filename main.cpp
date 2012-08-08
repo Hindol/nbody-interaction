@@ -89,9 +89,11 @@ void addAcc(int i, int j) {
     double aj = Gdivd*body[i].mass;
 
     // apply acceleration components using unit vectors
-    for (int k = 0; k < 3; ++k) {
-        body[j].acc[k] += aj*ud[k];
-        body[i].acc[k] -= ai*ud[k];
+    for (int k = 0; k < 3; ++k)
+    {
+        // The following lines may lead to race condition, so put in critical section
+        #pragma omp critical { body[j].acc[k] += aj*ud[k]; }
+        #pragma omp critical { body[i].acc[k] -= ai*ud[k]; }
     }
 }
 
